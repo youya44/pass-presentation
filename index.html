@@ -1,0 +1,2097 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920">
+<title>デザインサブスクリプション「PASS」- 株式会社SAKAZUKI</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --teal: #3DD5C0;
+    --teal-dark: #2AB5A3;
+    --teal-light: #E8F9F7;
+    --teal-bg: #EAF8F6;
+    --yellow: #FFD700;
+    --orange: #FF6B35;
+    --dark: #1A1A1A;
+    --gray: #555;
+    --light-gray: #F5F5F5;
+    --white: #FFFFFF;
+    --border: #E0E0E0;
+  }
+
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Meiryo', sans-serif;
+    background: #2A2A2A;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .controls {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: rgba(0,0,0,0.8);
+    padding: 12px 28px;
+    border-radius: 50px;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+  }
+
+  .controls button {
+    background: var(--teal);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+    transition: all 0.2s;
+  }
+
+  .controls button:hover { background: var(--teal-dark); transform: scale(1.05); }
+  .controls button:disabled { background: #555; cursor: default; transform: none; }
+
+  .slide-counter {
+    color: white;
+    font-size: 14px;
+    min-width: 80px;
+    text-align: center;
+  }
+
+  .slide-dots {
+    display: flex;
+    gap: 6px;
+    max-width: 300px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .dot.active { background: var(--teal); transform: scale(1.3); }
+
+  /* Slide Container */
+  .slide-container {
+    width: 1920px;
+    height: 1080px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    margin-bottom: 100px;
+  }
+
+  .slide {
+    width: 1920px;
+    height: 1080px;
+    position: absolute;
+    top: 0; left: 0;
+    display: none;
+    overflow: hidden;
+  }
+
+  .slide.active { display: flex; }
+
+  /* ==================== SLIDE 1: TITLE ==================== */
+  .slide-01 {
+    background: var(--teal);
+    flex-direction: column;
+    justify-content: center;
+    padding: 100px 140px;
+  }
+
+  .slide-01 .logo-area {
+    margin-bottom: 80px;
+  }
+
+  .slide-01 .logo-text {
+    font-size: 22px;
+    color: rgba(255,255,255,0.9);
+    font-weight: bold;
+    margin-bottom: 12px;
+    letter-spacing: 0.05em;
+  }
+
+  .slide-01 .logo-mark {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .logo-icon {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .logo-slash {
+    width: 18px;
+    height: 72px;
+    background: white;
+    transform: skewX(-15deg);
+    border-radius: 3px;
+  }
+
+  .logo-circle {
+    width: 72px;
+    height: 72px;
+    background: white;
+    border-radius: 50%;
+  }
+
+  .logo-pass {
+    font-size: 88px;
+    font-weight: 900;
+    color: white;
+    letter-spacing: -0.02em;
+    margin-left: 8px;
+    font-family: 'Arial Black', 'Hiragino Sans', sans-serif;
+  }
+
+  .slide-01 .main-title {
+    font-size: 52px;
+    color: white;
+    font-weight: bold;
+    margin-bottom: 24px;
+    line-height: 1.3;
+  }
+
+  .slide-01 .sub-title {
+    font-size: 30px;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 60px;
+    line-height: 1.5;
+  }
+
+  .slide-01 .company-info {
+    font-size: 22px;
+    color: rgba(255,255,255,0.8);
+  }
+
+  .slide-01 .deco {
+    position: absolute;
+    bottom: -60px;
+    right: -60px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+    opacity: 0.25;
+  }
+
+  .slide-01 .deco .big-slash {
+    width: 60px;
+    height: 380px;
+    background: white;
+    transform: skewX(-15deg);
+    border-radius: 6px;
+  }
+
+  .slide-01 .deco .big-circle {
+    width: 380px;
+    height: 380px;
+    background: white;
+    border-radius: 50%;
+    margin-bottom: -40px;
+  }
+
+  /* ==================== SLIDE 2: COMPANY ==================== */
+  .slide-02 {
+    background: white;
+    flex-direction: column;
+    padding: 80px 140px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 60px;
+  }
+
+  .section-icon {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .s-slash {
+    width: 8px;
+    height: 36px;
+    background: var(--teal);
+    transform: skewX(-15deg);
+    border-radius: 2px;
+  }
+
+  .s-circle {
+    width: 36px;
+    height: 36px;
+    background: var(--teal);
+    border-radius: 50%;
+  }
+
+  .section-title-wrap { display: flex; flex-direction: column; }
+  .section-label { font-size: 14px; color: var(--teal); font-weight: bold; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
+  .section-title { font-size: 42px; font-weight: bold; color: var(--dark); line-height: 1.2; }
+
+  .company-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 50px;
+    flex: 1;
+  }
+
+  .company-block h3 {
+    font-size: 20px;
+    color: var(--teal);
+    font-weight: bold;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--teal);
+    letter-spacing: 0.05em;
+  }
+
+  .company-block p {
+    font-size: 22px;
+    color: var(--dark);
+    line-height: 1.7;
+  }
+
+  .company-block ul { list-style: none; }
+  .company-block ul li {
+    font-size: 20px;
+    color: var(--dark);
+    padding: 8px 0;
+    padding-left: 20px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .company-block ul li::before {
+    content: '・';
+    position: absolute;
+    left: 0;
+    color: var(--teal);
+  }
+
+  /* ==================== SLIDE 3: PROBLEM ==================== */
+  .slide-03 {
+    background: white;
+    flex-direction: column;
+    padding: 80px 140px;
+  }
+
+  .problem-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 50px;
+    flex: 1;
+    align-items: center;
+  }
+
+  .problem-card {
+    background: var(--teal-bg);
+    border-radius: 20px;
+    padding: 50px 40px;
+    position: relative;
+  }
+
+  .problem-number {
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    background: var(--teal);
+    display: inline-block;
+    padding: 4px 16px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+    letter-spacing: 0.1em;
+  }
+
+  .problem-card h3 {
+    font-size: 32px;
+    font-weight: bold;
+    color: var(--dark);
+    margin-bottom: 20px;
+    line-height: 1.3;
+  }
+
+  .problem-card p {
+    font-size: 20px;
+    color: var(--gray);
+    line-height: 1.6;
+  }
+
+  .problem-card .accent {
+    font-size: 22px;
+    color: var(--orange);
+    font-weight: bold;
+    font-style: italic;
+  }
+
+  /* ==================== SLIDE 4: SOLUTION ==================== */
+  .slide-04 {
+    background: white;
+    flex-direction: column;
+    padding: 80px 140px;
+  }
+
+  .solution-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    flex: 1;
+    align-items: center;
+  }
+
+  .solution-left h2 {
+    font-size: 44px;
+    font-weight: bold;
+    color: var(--dark);
+    line-height: 1.3;
+    margin-bottom: 24px;
+  }
+
+  .solution-left p {
+    font-size: 22px;
+    color: var(--gray);
+    line-height: 1.7;
+  }
+
+  .before-after {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .ba-block {
+    border-radius: 16px;
+    padding: 32px 40px;
+  }
+
+  .ba-block.before-block {
+    background: #F5F5F5;
+    border-left: 6px solid #CCC;
+  }
+
+  .ba-block.after-block {
+    background: var(--teal-bg);
+    border-left: 6px solid var(--teal);
+  }
+
+  .ba-label {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 16px;
+    letter-spacing: 0.1em;
+  }
+
+  .before-block .ba-label { color: #999; }
+  .after-block .ba-label { color: var(--teal); }
+
+  .ba-list { list-style: none; }
+  .ba-list li {
+    font-size: 20px;
+    padding: 6px 0;
+    padding-left: 28px;
+    position: relative;
+    line-height: 1.4;
+  }
+
+  .before-block .ba-list li { color: #666; }
+  .before-block .ba-list li::before { content: '✕'; position: absolute; left: 0; color: #999; }
+
+  .after-block .ba-list li { color: var(--dark); font-weight: bold; }
+  .after-block .ba-list li::before { content: '✓'; position: absolute; left: 0; color: var(--teal); }
+
+  /* ==================== SLIDE 5,6,7: STRENGTHS ==================== */
+  .slide-strength {
+    background: white;
+    flex-direction: column;
+    padding: 80px 140px;
+  }
+
+  .strength-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    flex: 1;
+    align-items: center;
+  }
+
+  .strength-left {}
+
+  .strength-desc {
+    font-size: 26px;
+    color: var(--dark);
+    font-weight: bold;
+    margin-bottom: 40px;
+    line-height: 1.5;
+  }
+
+  .strength-list { list-style: none; display: flex; flex-direction: column; gap: 20px; }
+  .strength-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    font-size: 22px;
+    color: var(--dark);
+    line-height: 1.5;
+  }
+
+  .strength-bullet {
+    width: 28px;
+    height: 28px;
+    background: var(--teal);
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .strength-right {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .strength-card {
+    background: var(--teal-bg);
+    border-radius: 20px;
+    padding: 36px 40px;
+  }
+
+  .strength-card h4 {
+    font-size: 18px;
+    color: var(--teal);
+    font-weight: bold;
+    margin-bottom: 14px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .strength-card p {
+    font-size: 20px;
+    color: var(--dark);
+    line-height: 1.6;
+  }
+
+  /* ==================== SLIDE 8: FLOW ==================== */
+  .slide-08 {
+    background: white;
+    flex-direction: column;
+    padding: 80px 140px;
+  }
+
+  .flow-steps {
+    display: flex;
+    gap: 0;
+    align-items: stretch;
+    flex: 1;
+  }
+
+  .flow-step {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .flow-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: -24px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 24px solid var(--teal);
+    border-top: 30px solid transparent;
+    border-bottom: 30px solid transparent;
+    z-index: 10;
+  }
+
+  .step-header {
+    background: var(--teal);
+    color: white;
+    padding: 20px 30px;
+    text-align: center;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .step-num {
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.15em;
+    opacity: 0.9;
+    margin-bottom: 6px;
+  }
+
+  .step-name {
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .step-body {
+    background: var(--teal-bg);
+    border-radius: 0 0 12px 12px;
+    padding: 30px;
+    flex: 1;
+    margin: 0 8px;
+  }
+
+  .step-body p {
+    font-size: 18px;
+    color: var(--dark);
+    line-height: 1.6;
+  }
+
+  .flow-note {
+    text-align: center;
+    font-size: 22px;
+    color: var(--gray);
+    margin-top: 40px;
+    font-style: italic;
+  }
+
+  /* ==================== SLIDE 9: MENU ==================== */
+  .slide-09 {
+    background: white;
+    flex-direction: column;
+    padding: 80px 140px;
+  }
+
+  .menu-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 80px;
+    flex: 1;
+    align-items: center;
+  }
+
+  .menu-desc {
+    font-size: 26px;
+    color: var(--dark);
+    line-height: 1.6;
+    margin-bottom: 40px;
+  }
+
+  .ticket-visual {
+    background: var(--teal);
+    border-radius: 20px;
+    padding: 40px 50px;
+    color: white;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .ticket-visual h3 {
+    font-size: 50px;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .ticket-visual p {
+    font-size: 20px;
+    opacity: 0.9;
+    margin-top: 8px;
+  }
+
+  .menu-items {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .menu-item {
+    background: var(--teal-bg);
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .menu-item-name { font-size: 18px; color: var(--dark); font-weight: bold; }
+  .menu-item-ticket { font-size: 18px; color: var(--teal); font-weight: bold; }
+
+  /* ==================== SLIDES 10,11: CASE STUDIES ==================== */
+  .slide-case {
+    background: white;
+    flex-direction: column;
+    padding: 80px 140px;
+  }
+
+  .case-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    flex: 1;
+    align-items: start;
+  }
+
+  .case-desc {
+    font-size: 26px;
+    font-weight: bold;
+    color: var(--dark);
+    margin-bottom: 40px;
+    line-height: 1.5;
+  }
+
+  .case-ba {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .case-ba-block {
+    border-radius: 16px;
+    padding: 28px 36px;
+  }
+
+  .case-ba-label {
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+
+  .before-c { background: #F5F5F5; border-left: 5px solid #DDD; }
+  .before-c .case-ba-label { color: #999; }
+  .after-c { background: var(--teal-bg); border-left: 5px solid var(--teal); }
+  .after-c .case-ba-label { color: var(--teal); }
+
+  .case-ba-block p {
+    font-size: 20px;
+    color: var(--dark);
+    line-height: 1.6;
+  }
+
+  .case-quote {
+    background: var(--teal);
+    border-radius: 16px;
+    padding: 28px 36px;
+    margin-top: 24px;
+  }
+
+  .case-quote p {
+    font-size: 20px;
+    color: white;
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  .case-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .stat-card {
+    background: var(--teal);
+    border-radius: 20px;
+    padding: 40px 50px;
+    text-align: center;
+    color: white;
+  }
+
+  .stat-num {
+    font-size: 72px;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .stat-unit { font-size: 32px; font-weight: bold; }
+  .stat-label { font-size: 20px; opacity: 0.9; margin-top: 8px; }
+
+  /* ==================== SLIDE 12: PORTFOLIO ==================== */
+  .slide-12 {
+    background: white;
+    flex-direction: column;
+    padding: 80px 140px;
+  }
+
+  .portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    flex: 1;
+    align-content: center;
+  }
+
+  .portfolio-item {
+    background: var(--teal-bg);
+    border-radius: 16px;
+    aspect-ratio: 4/3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    border: 2px dashed var(--teal);
+    transition: all 0.2s;
+  }
+
+  .portfolio-icon {
+    font-size: 48px;
+    color: var(--teal);
+  }
+
+  .portfolio-label {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--dark);
+  }
+
+  /* ==================== SLIDE 13: QUALITY ==================== */
+  .slide-13 {
+    background: white;
+    flex-direction: column;
+    padding: 80px 140px;
+  }
+
+  .quality-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 50px;
+    flex: 1;
+    align-items: center;
+  }
+
+  .quality-card {
+    background: var(--teal-bg);
+    border-radius: 20px;
+    padding: 50px 40px;
+    text-align: center;
+  }
+
+  .quality-icon {
+    font-size: 56px;
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  .quality-card h3 {
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--teal);
+    margin-bottom: 16px;
+  }
+
+  .quality-card p {
+    font-size: 19px;
+    color: var(--dark);
+    line-height: 1.7;
+  }
+
+  /* ==================== SLIDES 14,15: COST SIM ==================== */
+  .slide-cost {
+    background: white;
+    flex-direction: column;
+    padding: 80px 140px;
+  }
+
+  .cost-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    flex: 1;
+    align-items: center;
+  }
+
+  .cost-block {
+    border-radius: 20px;
+    padding: 50px 50px;
+    text-align: center;
+  }
+
+  .cost-block.old-cost {
+    background: #3A3A3A;
+    color: white;
+  }
+
+  .cost-block.new-cost {
+    background: var(--teal);
+    color: white;
+  }
+
+  .cost-block h3 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    opacity: 0.9;
+    letter-spacing: 0.05em;
+  }
+
+  .cost-items { list-style: none; text-align: left; margin-bottom: 30px; }
+  .cost-items li {
+    font-size: 19px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    opacity: 0.9;
+  }
+
+  .cost-total {
+    font-size: 54px;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .cost-total-label {
+    font-size: 18px;
+    opacity: 0.8;
+    margin-top: 8px;
+  }
+
+  .cost-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .arrow-icon {
+    font-size: 60px;
+    color: var(--teal);
+  }
+
+  .savings-badge {
+    background: var(--orange);
+    color: white;
+    border-radius: 50%;
+    width: 160px;
+    height: 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+  }
+
+  .savings-badge .pct {
+    font-size: 44px;
+    line-height: 1;
+  }
+
+  .savings-badge .pct-label { font-size: 16px; margin-top: 4px; }
+
+  .result-text {
+    font-size: 26px;
+    font-weight: bold;
+    color: var(--dark);
+    text-align: center;
+    margin-top: 40px;
+  }
+
+  /* ==================== SLIDE 16: PRICING ==================== */
+  .slide-16 {
+    background: white;
+    flex-direction: column;
+    padding: 80px 140px;
+  }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 50px;
+    flex: 1;
+    align-items: stretch;
+  }
+
+  .pricing-card {
+    border-radius: 24px;
+    padding: 50px 40px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pricing-card.standard {
+    background: var(--teal);
+    color: white;
+    transform: scale(1.04);
+    box-shadow: 0 20px 60px rgba(61,213,192,0.35);
+  }
+
+  .pricing-card.light { background: var(--light-gray); }
+  .pricing-card.premium { background: #1A1A1A; color: white; }
+
+  .plan-badge {
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 20px;
+    align-self: flex-start;
+  }
+
+  .standard .plan-badge { background: rgba(255,255,255,0.25); color: white; }
+  .light .plan-badge { background: var(--teal-bg); color: var(--teal); }
+  .premium .plan-badge { background: rgba(255,255,255,0.15); color: #FFD700; }
+
+  .recommend-badge {
+    position: absolute;
+    top: 28px;
+    right: 28px;
+    background: white;
+    color: var(--teal);
+    font-size: 13px;
+    font-weight: bold;
+    padding: 6px 16px;
+    border-radius: 20px;
+  }
+
+  .plan-name {
+    font-size: 36px;
+    font-weight: 900;
+    margin-bottom: 8px;
+  }
+
+  .standard .plan-name { color: white; }
+  .light .plan-name { color: var(--dark); }
+
+  .plan-price {
+    font-size: 56px;
+    font-weight: 900;
+    line-height: 1;
+    margin: 20px 0 8px;
+  }
+
+  .plan-price-unit { font-size: 20px; font-weight: normal; }
+  .plan-price-note { font-size: 16px; opacity: 0.7; margin-bottom: 30px; }
+
+  .plan-features { list-style: none; flex: 1; }
+  .plan-features li {
+    font-size: 18px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .standard .plan-features li { border-color: rgba(255,255,255,0.2); }
+  .premium .plan-features li { border-color: rgba(255,255,255,0.1); }
+
+  .feat-check { color: var(--teal); font-size: 20px; font-weight: bold; flex-shrink: 0; }
+  .standard .feat-check { color: rgba(255,255,255,0.9); }
+  .premium .feat-check { color: #FFD700; }
+
+  /* ==================== SLIDE 17: CONTRACT ==================== */
+  .slide-17 {
+    background: white;
+    flex-direction: column;
+    padding: 80px 140px;
+  }
+
+  .contract-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    flex: 1;
+    align-items: center;
+  }
+
+  .contract-steps { display: flex; flex-direction: column; gap: 24px; }
+
+  .contract-step {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    background: var(--teal-bg);
+    border-radius: 16px;
+    padding: 28px 36px;
+  }
+
+  .cs-num {
+    width: 56px;
+    height: 56px;
+    background: var(--teal);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+
+  .cs-text h4 { font-size: 22px; font-weight: bold; color: var(--dark); margin-bottom: 4px; }
+  .cs-text p { font-size: 17px; color: var(--gray); }
+
+  .campaign-box {
+    background: var(--teal);
+    border-radius: 24px;
+    padding: 60px 50px;
+    text-align: center;
+    color: white;
+  }
+
+  .campaign-box .star { font-size: 40px; margin-bottom: 16px; }
+  .campaign-box h3 { font-size: 30px; font-weight: bold; margin-bottom: 16px; line-height: 1.4; }
+  .campaign-box p { font-size: 20px; opacity: 0.9; line-height: 1.6; }
+
+  /* ==================== SLIDE 18: FAQ ==================== */
+  .slide-18 {
+    background: white;
+    flex-direction: column;
+    padding: 80px 140px;
+  }
+
+  .faq-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    flex: 1;
+    align-content: center;
+  }
+
+  .faq-item {
+    background: var(--teal-bg);
+    border-radius: 16px;
+    padding: 36px 40px;
+  }
+
+  .faq-q {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--dark);
+    margin-bottom: 14px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .faq-q-mark {
+    background: var(--teal);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .faq-a {
+    font-size: 19px;
+    color: var(--dark);
+    line-height: 1.6;
+    padding-left: 40px;
+  }
+
+  /* ==================== SLIDE 19: WHY NOW ==================== */
+  .slide-19 {
+    background: var(--teal);
+    flex-direction: column;
+    justify-content: center;
+    padding: 100px 200px;
+    text-align: center;
+  }
+
+  .slide-19 h2 {
+    font-size: 80px;
+    font-weight: 900;
+    color: white;
+    margin-bottom: 40px;
+  }
+
+  .slide-19 .why-body {
+    font-size: 30px;
+    color: rgba(255,255,255,0.95);
+    line-height: 1.8;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .slide-19 .why-cta {
+    font-size: 32px;
+    font-weight: bold;
+    color: white;
+    background: rgba(255,255,255,0.2);
+    border-radius: 100px;
+    padding: 24px 60px;
+    display: inline-block;
+    margin-top: 50px;
+    border: 2px solid rgba(255,255,255,0.5);
+  }
+
+  /* ==================== SLIDE 20: CTA ==================== */
+  .slide-20 {
+    background: white;
+    flex-direction: column;
+    padding: 80px 140px;
+  }
+
+  .cta-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 100px;
+    flex: 1;
+    align-items: center;
+  }
+
+  .cta-left h2 {
+    font-size: 52px;
+    font-weight: bold;
+    color: var(--dark);
+    line-height: 1.3;
+    margin-bottom: 30px;
+  }
+
+  .cta-left p {
+    font-size: 24px;
+    color: var(--gray);
+    line-height: 1.7;
+  }
+
+  .cta-right {
+    background: var(--teal-bg);
+    border-radius: 28px;
+    padding: 60px 60px;
+  }
+
+  .cta-right h3 {
+    font-size: 26px;
+    font-weight: bold;
+    color: var(--teal);
+    margin-bottom: 36px;
+    text-align: center;
+  }
+
+  .cta-info { list-style: none; display: flex; flex-direction: column; gap: 24px; }
+  .cta-info li {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 22px;
+    color: var(--dark);
+  }
+
+  .cta-icon {
+    width: 44px;
+    height: 44px;
+    background: var(--teal);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .cta-company {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 2px solid var(--border);
+  }
+
+  .cta-company p { font-size: 20px; font-weight: bold; color: var(--dark); }
+
+  /* ==================== COMMON SLIDE HEADER ==================== */
+  .slide-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 60px;
+    flex-shrink: 0;
+  }
+
+  .slide-header .s-icon {
+    position: relative;
+    width: 56px;
+    height: 56px;
+  }
+
+  .slide-header-content { display: flex; flex-direction: column; }
+  .slide-header-label { font-size: 14px; color: var(--teal); font-weight: bold; letter-spacing: 0.12em; text-transform: uppercase; }
+  .slide-header-title { font-size: 46px; font-weight: bold; color: var(--dark); line-height: 1.2; }
+  .slide-header-sub { font-size: 22px; color: var(--gray); margin-top: 8px; }
+
+  /* FOOTER LOGO */
+  .slide-footer {
+    position: absolute;
+    bottom: 32px;
+    left: 140px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .footer-slash {
+    width: 5px;
+    height: 22px;
+    background: var(--teal);
+    transform: skewX(-15deg);
+    border-radius: 1px;
+  }
+
+  .footer-circle {
+    width: 22px;
+    height: 22px;
+    background: var(--teal);
+    border-radius: 50%;
+  }
+
+  .footer-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--teal);
+    letter-spacing: 0.05em;
+  }
+
+  /* Transition */
+  .slide-container { perspective: 1000px; }
+  .slide { transition: opacity 0.3s ease; }
+
+  /* Responsive scale for smaller screens */
+  @media (max-width: 1920px) {
+    body { padding: 10px; }
+    .slide-container {
+      transform-origin: top center;
+      transform: scale(var(--slide-scale, 1));
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="slide-container" id="slideContainer">
+
+  <!-- ==================== SLIDE 01: TITLE ==================== -->
+  <div class="slide slide-01 active" id="slide-1">
+    <div class="logo-area">
+      <div class="logo-text">デザイン定額サービス</div>
+      <div class="logo-mark">
+        <div class="logo-icon">
+          <div class="logo-slash"></div>
+          <div class="logo-circle"></div>
+        </div>
+        <div class="logo-pass">PASS</div>
+      </div>
+    </div>
+    <div class="main-title">デザインサブスクリプション「PASS」</div>
+    <div class="sub-title">採用コスト0で、即戦力デザインチームをあなたの手元に。</div>
+    <div class="company-info">株式会社SAKAZUKI</div>
+    <div class="deco">
+      <div class="big-slash"></div>
+      <div class="big-circle"></div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 02: COMPANY ==================== -->
+  <div class="slide slide-02" id="slide-2">
+    <div class="slide-header">
+      <div class="section-icon"><div class="s-slash"></div><div class="s-circle"></div></div>
+      <div class="slide-header-content">
+        <div class="slide-header-label">About Us</div>
+        <div class="slide-header-title">私たちは「志」をデザインで具現化するパートナーです</div>
+      </div>
+    </div>
+    <div class="company-grid">
+      <div class="company-block">
+        <h3>Vision</h3>
+        <p>SAKAZUKIのビジョンを一言で</p>
+      </div>
+      <div class="company-block">
+        <h3>Company</h3>
+        <p>株式会社SAKAZUKI</p>
+        <p style="margin-top:12px; font-size:18px; color:var(--gray);">代表取締役 [代表者名]</p>
+        <br>
+        <h3 style="margin-top:20px;">Business</h3>
+        <ul>
+          <li>デザインサブスクリプション事業「PASS」</li>
+          <li>ブランディング・デザイン制作</li>
+        </ul>
+      </div>
+      <div class="company-block">
+        <h3>実績</h3>
+        <ul>
+          <li>累計導入企業 [XX]社以上</li>
+          <li>継続率 [XX]%</li>
+          <li>平均契約期間 [XX]ヶ月</li>
+          <li>業種を問わず幅広い実績</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <div class="footer-logo"><div class="footer-slash"></div><div class="footer-circle"></div></div>
+      <div class="footer-text">PASS</div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 03: PROBLEM ==================== -->
+  <div class="slide slide-03" id="slide-3">
+    <div class="slide-header">
+      <div class="section-icon"><div class="s-slash"></div><div class="s-circle"></div></div>
+      <div class="slide-header-content">
+        <div class="slide-header-label">Problem</div>
+        <div class="slide-header-title">課題提起：クリエイティブの「3つの壁」</div>
+      </div>
+    </div>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-number">WALL 01</div>
+        <h3>採用難易度の高騰</h3>
+        <p>有効求人倍率 [X.X]倍、採用期間 [3〜6]ヶ月</p>
+        <p style="margin-top:16px;" class="accent">採れない・育てられない</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-number">WALL 02</div>
+        <h3>外注管理の複雑さ</h3>
+        <p>見積もり、契約、ディレクションでコア業務を圧迫</p>
+        <p style="margin-top:16px;" class="accent">手間・時間・コストが爆増</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-number">WALL 03</div>
+        <h3>品質のバラつき</h3>
+        <p>クラウドソーシング等の品質不安定、ブランド毀損リスク</p>
+        <p style="margin-top:16px;" class="accent">安心して任せられない</p>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <div class="footer-logo"><div class="footer-slash"></div><div class="footer-circle"></div></div>
+      <div class="footer-text">PASS</div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 04: SOLUTION ==================== -->
+  <div class="slide slide-04" id="slide-4">
+    <div class="slide-header">
+      <div class="section-icon"><div class="s-slash"></div><div class="s-circle"></div></div>
+      <div class="slide-header-content">
+        <div class="slide-header-label">Solution</div>
+        <div class="slide-header-title">解決策：デザインサブスク「PASS」とは</div>
+        <div class="slide-header-sub">必要な時に、必要なだけ。月額制デザインチーム。</div>
+      </div>
+    </div>
+    <div class="solution-layout">
+      <div class="solution-left">
+        <h2>採用・育成・管理コストをゼロにし、ビジネスを加速させます。</h2>
+        <p>PASSは月額固定でデザインチームがそのままあなたの会社の制作部門として機能します。依頼はチャット一本で完結。</p>
+      </div>
+      <div class="before-after">
+        <div class="ba-block before-block">
+          <div class="ba-label">■ Before</div>
+          <ul class="ba-list">
+            <li>採用できない</li>
+            <li>見積もりが面倒</li>
+            <li>クオリティ不安定</li>
+          </ul>
+        </div>
+        <div class="ba-block after-block">
+          <div class="ba-label">■ After (PASS)</div>
+          <ul class="ba-list">
+            <li>チャット一本でプロに依頼</li>
+            <li>月額固定・追加費用なし</li>
+            <li>厳選された専任チーム</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <div class="footer-logo"><div class="footer-slash"></div><div class="footer-circle"></div></div>
+      <div class="footer-text">PASS</div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 05: STRENGTH 1 ==================== -->
+  <div class="slide slide-strength" id="slide-5">
+    <div class="slide-header">
+      <div class="section-icon"><div class="s-slash"></div><div class="s-circle"></div></div>
+      <div class="slide-header-content">
+        <div class="slide-header-label">Strength 01</div>
+        <div class="slide-header-title">PASSの強み①：広範囲な対応領域</div>
+        <div class="slide-header-sub">Webも、紙も、映像も。あらゆる制作物をワンストップで。</div>
+      </div>
+    </div>
+    <div class="strength-content">
+      <div class="strength-left">
+        <p class="strength-desc">PASSなら、あらゆるデザインニーズに対応。複数の外注先を管理する手間がゼロに。</p>
+        <ul class="strength-list">
+          <li><div class="strength-bullet">W</div><span><strong>Web：</strong>LPデザイン / バナー / UIデザイン</span></li>
+          <li><div class="strength-bullet">G</div><span><strong>Graphic：</strong>チラシ / パンフレット / 名刺 / ロゴ</span></li>
+          <li><div class="strength-bullet">B</div><span><strong>Business：</strong>営業資料 / ホワイトペーパー</span></li>
+          <li><div class="strength-bullet">M</div><span><strong>Movie：</strong>動画編集（※プランによる）</span></li>
+        </ul>
+      </div>
+      <div class="strength-right">
+        <div class="strength-card">
+          <h4>対応制作物 20種類以上</h4>
+          <p>名刺・チラシ・ポスター・パンフレット・メニュー・バナー・ロゴ・キービジュアル・Webデザイン・Webコーディング・動画など多数。</p>
+        </div>
+        <div class="strength-card">
+          <h4>月額依頼し放題</h4>
+          <p>定額制だからコストを気にせず依頼できます。チケット制で優先度も柔軟に調整可能。</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <div class="footer-logo"><div class="footer-slash"></div><div class="footer-circle"></div></div>
+      <div class="footer-text">PASS</div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 06: STRENGTH 2 ==================== -->
+  <div class="slide slide-strength" id="slide-6">
+    <div class="slide-header">
+      <div class="section-icon"><div class="s-slash"></div><div class="s-circle"></div></div>
+      <div class="slide-header-content">
+        <div class="slide-header-label">Strength 02</div>
+        <div class="slide-header-title">PASSの強み②：圧倒的なスピードと質</div>
+        <div class="slide-header-sub">ビジネスを止めないスピード。最短1営業日で初稿提出。</div>
+      </div>
+    </div>
+    <div class="strength-content">
+      <div class="strength-left">
+        <p class="strength-desc">専任ディレクターによるダブルチェック体制で、修正の手間を最小限に。</p>
+        <ul class="strength-list">
+          <li><div class="strength-bullet">⚡</div><span><strong>バナー：</strong>[1〜2]営業日</span></li>
+          <li><div class="strength-bullet">⚡</div><span><strong>チラシ：</strong>[2〜3]営業日</span></li>
+          <li><div class="strength-bullet">⚡</div><span><strong>LP：</strong>[5〜7]営業日</span></li>
+        </ul>
+      </div>
+      <div class="strength-right">
+        <div class="strength-card">
+          <h4>専任ディレクター制</h4>
+          <p>ディレクターがあなたの会社を深く理解した上で制作をアサイン。品質とスピードを両立します。</p>
+        </div>
+        <div class="strength-card">
+          <h4>修正無制限</h4>
+          <p>追加料金なしで何度でも修正対応。「思っていたのと違う…」がなくなります。</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <div class="footer-logo"><div class="footer-slash"></div><div class="footer-circle"></div></div>
+      <div class="footer-text">PASS</div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 07: STRENGTH 3 ==================== -->
+  <div class="slide slide-strength" id="slide-7">
+    <div class="slide-header">
+      <div class="section-icon"><div class="s-slash"></div><div class="s-circle"></div></div>
+      <div class="slide-header-content">
+        <div class="slide-header-label">Strength 03</div>
+        <div class="slide-header-title">PASSの強み③：事業理解に基づくデザイン</div>
+        <div class="slide-header-sub">SAKAZUKIの強みである「構造思考」を活用。</div>
+      </div>
+    </div>
+    <div class="strength-content">
+      <div class="strength-left">
+        <p class="strength-desc">単なる作業代行ではなく、貴社の事業課題やKPIを理解した上で、「売れる」「伝わる」デザインを設計します。</p>
+        <ul class="strength-list">
+          <li><div class="strength-bullet">★</div><span>経営者視点での壁打ちも可能</span></li>
+          <li><div class="strength-bullet">★</div><span>ブランドガイドラインの構築・維持</span></li>
+          <li><div class="strength-bullet">★</div><span>KPIドリブンなクリエイティブ改善</span></li>
+        </ul>
+      </div>
+      <div class="strength-right">
+        <div class="strength-card">
+          <h4>構造思考デザイン</h4>
+          <p>伝えたいことを整理し、ターゲットに最も刺さる構成と表現を提案。デザインを「コスト」から「投資」に変えます。</p>
+        </div>
+        <div class="strength-card">
+          <h4>継続的なブランド強化</h4>
+          <p>月次での振り返りとアップデートで、御社のブランド価値を継続的に高めていきます。</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <div class="footer-logo"><div class="footer-slash"></div><div class="footer-circle"></div></div>
+      <div class="footer-text">PASS</div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 08: FLOW ==================== -->
+  <div class="slide slide-08" id="slide-8">
+    <div class="slide-header">
+      <div class="section-icon"><div class="s-slash"></div><div class="s-circle"></div></div>
+      <div class="slide-header-content">
+        <div class="slide-header-label">How it Works</div>
+        <div class="slide-header-title">制作フロー：チャット一本で完結</div>
+        <div class="slide-header-sub">まるで「隣の席」にいるような感覚で。</div>
+      </div>
+    </div>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="step-header"><div class="step-num">STEP 01</div><div class="step-name">Request</div></div>
+        <div class="step-body"><p>チャットでテンプレに沿って依頼内容を記入。打ち合わせや電話は原則不要。</p></div>
+      </div>
+      <div class="flow-step">
+        <div class="step-header"><div class="step-num">STEP 02</div><div class="step-name">Direction</div></div>
+        <div class="step-body"><p>専任ディレクターが内容を確認し、最適なデザイナーをアサイン。</p></div>
+      </div>
+      <div class="flow-step">
+        <div class="step-header"><div class="step-num">STEP 03</div><div class="step-name">Design</div></div>
+        <div class="step-body"><p>制作開始。初稿を提出、お客様に確認いただきます。</p></div>
+      </div>
+      <div class="flow-step">
+        <div class="step-header"><div class="step-num">STEP 04</div><div class="step-name">Check</div></div>
+        <div class="step-body"><p>初稿提出・修正対応。追加料金なしで何度でも修正可能。</p></div>
+      </div>
+      <div class="flow-step">
+        <div class="step-header"><div class="step-num">STEP 05</div><div class="step-name">納品</div></div>
+        <div class="step-body"><p>最終確認後、納品データをお渡し。次の依頼もすぐに開始できます。</p></div>
+      </div>
+    </div>
+    <div class="flow-note">※面倒なMTGや電話は原則不要</div>
+    <div class="slide-footer">
+      <div class="footer-logo"><div class="footer-slash"></div><div class="footer-circle"></div></div>
+      <div class="footer-text">PASS</div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 09: MENU ==================== -->
+  <div class="slide slide-09" id="slide-9">
+    <div class="slide-header">
+      <div class="section-icon"><div class="s-slash"></div><div class="s-circle"></div></div>
+      <div class="slide-header-content">
+        <div class="slide-header-label">Service Menu</div>
+        <div class="slide-header-title">提供メニュー・チケット制</div>
+      </div>
+    </div>
+    <div class="menu-layout">
+      <div>
+        <p class="menu-desc">1チケット（工数）で、これだけの制作が可能です。プランにより毎月の付与数が異なります。</p>
+        <div class="ticket-visual">
+          <h3>チケット制</h3>
+          <p>プランに応じた月間チケットで<br>柔軟にデザインを発注</p>
+        </div>
+      </div>
+      <div>
+        <div class="menu-items">
+          <div class="menu-item"><span class="menu-item-name">バナー制作</span><span class="menu-item-ticket">0.5 チケット</span></div>
+          <div class="menu-item"><span class="menu-item-name">名刺デザイン</span><span class="menu-item-ticket">1.0 チケット</span></div>
+          <div class="menu-item"><span class="menu-item-name">A4チラシ（片面）</span><span class="menu-item-ticket">1.5 チケット</span></div>
+          <div class="menu-item"><span class="menu-item-name">A4チラシ（両面）</span><span class="menu-item-ticket">2.0 チケット</span></div>
+          <div class="menu-item"><span class="menu-item-name">キービジュアル</span><span class="menu-item-ticket">2.5 チケット</span></div>
+          <div class="menu-item"><span class="menu-item-name">ロゴ作成</span><span class="menu-item-ticket">3.5 チケット</span></div>
+          <div class="menu-item"><span class="menu-item-name">LPデザイン（SP）</span><span class="menu-item-ticket">5.0 チケット</span></div>
+          <div class="menu-item"><span class="menu-item-name">営業資料作成</span><span class="menu-item-ticket">2.0 チケット</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <div class="footer-logo"><div class="footer-slash"></div><div class="footer-circle"></div></div>
+      <div class="footer-text">PASS</div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 10: CASE STUDY A ==================== -->
+  <div class="slide slide-case" id="slide-10">
+    <div class="slide-header">
+      <div class="section-icon"><div class="s-slash"></div><div class="s-circle"></div></div>
+      <div class="slide-header-content">
+        <div class="slide-header-label">Case Study 01</div>
+        <div class="slide-header-title">導入事例①：株式会社[企業名A] 様</div>
+      </div>
+    </div>
+    <div class="case-layout">
+      <div>
+        <p class="case-desc">デザイン外注から切り替え。コスト [XX]% 削減に成功。</p>
+        <div class="case-ba">
+          <div class="case-ba-block before-c">
+            <div class="case-ba-label">■ Before</div>
+            <p>都度外注でコストが積み重なり、担当者の管理工数も膨大に。品質もバラバラで社内からの不満も。</p>
+          </div>
+          <div class="case-ba-block after-c">
+            <div class="case-ba-label">■ After</div>
+            <p>PASSに切り替え後、月々のデザインコストが大幅削減。担当者の工数もほぼゼロに。</p>
+          </div>
+        </div>
+        <div class="case-quote">
+          <p>「月次コストが[XX]万円→[XX]万円に。さらにデザインのスピードも上がり、本業に集中できるようになりました」</p>
+        </div>
+      </div>
+      <div class="case-stats">
+        <div class="stat-card">
+          <div class="stat-num">53<span class="stat-unit">%</span></div>
+          <div class="stat-label">コスト削減達成</div>
+        </div>
+        <div class="stat-card" style="background: var(--teal-bg);">
+          <div class="stat-num" style="color:var(--teal);">11<span class="stat-unit" style="color:var(--teal);">万円</span></div>
+          <div class="stat-label" style="color:var(--gray);">月間コスト削減額</div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <div class="footer-logo"><div class="footer-slash"></div><div class="footer-circle"></div></div>
+      <div class="footer-text">PASS</div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 11: CASE STUDY B ==================== -->
+  <div class="slide slide-case" id="slide-11">
+    <div class="slide-header">
+      <div class="section-icon"><div class="s-slash"></div><div class="s-circle"></div></div>
+      <div class="slide-header-content">
+        <div class="slide-header-label">Case Study 02</div>
+        <div class="slide-header-title">導入事例②：株式会社[企業名B] 様</div>
+      </div>
+    </div>
+    <div class="case-layout">
+      <div>
+        <p class="case-desc">採用資料の刷新で、エントリー数が昨対比 [2] 倍に急増。</p>
+        <div class="case-ba">
+          <div class="case-ba-block before-c">
+            <div class="case-ba-label">■ Before</div>
+            <p>資料デザインが古い、SNSトンマナばらつき。優秀層からのエントリーが減少傾向に。</p>
+          </div>
+          <div class="case-ba-block after-c">
+            <div class="case-ba-label">■ After</div>
+            <p>トンマナ統一、資料フルリニューアル、優秀層からの応募増。採用広報の工数も大幅削減。</p>
+          </div>
+        </div>
+        <div class="case-quote">
+          <p>「採用広報の工数が減り、応募の質が上がりました。デザインへの投資対効果が非常に高い」</p>
+        </div>
+      </div>
+      <div class="case-stats">
+        <div class="stat-card">
+          <div class="stat-num">2<span class="stat-unit">倍</span></div>
+          <div class="stat-label">エントリー数 昨対比</div>
+        </div>
+        <div class="stat-card" style="background: var(--teal-bg);">
+          <div class="stat-num" style="color:var(--teal);">90<span class="stat-unit" style="color:var(--teal);">%</span></div>
+          <div class="stat-label" style="color:var(--gray);">ディレクション工数削減</div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <div class="footer-logo"><div class="footer-slash"></div><div class="footer-circle"></div></div>
+      <div class="footer-text">PASS</div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 12: PORTFOLIO ==================== -->
+  <div class="slide slide-12" id="slide-12">
+    <div class="slide-header">
+      <div class="section-icon"><div class="s-slash"></div><div class="s-circle"></div></div>
+      <div class="slide-header-content">
+        <div class="slide-header-label">Portfolio</div>
+        <div class="slide-header-title">Design Portfolio</div>
+        <div class="slide-header-sub">多様なテイストに対応可能。</div>
+      </div>
+    </div>
+    <div class="portfolio-grid">
+      <div class="portfolio-item"><div class="portfolio-icon">🌐</div><div class="portfolio-label">Webサイト</div></div>
+      <div class="portfolio-item"><div class="portfolio-icon">🎨</div><div class="portfolio-label">バナー</div></div>
+      <div class="portfolio-item"><div class="portfolio-icon">📄</div><div class="portfolio-label">パンフレット</div></div>
+      <div class="portfolio-item"><div class="portfolio-icon">✨</div><div class="portfolio-label">イラスト</div></div>
+      <div class="portfolio-item"><div class="portfolio-icon">📱</div><div class="portfolio-label">SNS投稿</div></div>
+      <div class="portfolio-item"><div class="portfolio-icon">🏷️</div><div class="portfolio-label">ロゴ</div></div>
+      <div class="portfolio-item"><div class="portfolio-icon">📊</div><div class="portfolio-label">営業資料</div></div>
+      <div class="portfolio-item"><div class="portfolio-icon">📽️</div><div class="portfolio-label">動画編集</div></div>
+    </div>
+    <div style="text-align:center; margin-top:32px; font-size:18px; color:var(--gray);">※実績画像は別途ご覧いただけます</div>
+    <div class="slide-footer">
+      <div class="footer-logo"><div class="footer-slash"></div><div class="footer-circle"></div></div>
+      <div class="footer-text">PASS</div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 13: QUALITY ==================== -->
+  <div class="slide slide-13" id="slide-13">
+    <div class="slide-header">
+      <div class="section-icon"><div class="s-slash"></div><div class="s-circle"></div></div>
+      <div class="slide-header-content">
+        <div class="slide-header-label">Quality & Security</div>
+        <div class="slide-header-title">品質・体制への安心</div>
+      </div>
+    </div>
+    <div class="quality-grid">
+      <div class="quality-card">
+        <span class="quality-icon">🎯</span>
+        <h3>厳選採用</h3>
+        <p>採用合格率 [X]%。実務経験豊富なプロのデザイナーのみ在籍。コンペや審査を通過したメンバーで構成。</p>
+      </div>
+      <div class="quality-card">
+        <span class="quality-icon">👥</span>
+        <h3>チーム体制</h3>
+        <p>ディレクターを含めたチームで品質管理。担当デザイナー + ディレクターによるダブルチェック体制。</p>
+      </div>
+      <div class="quality-card">
+        <span class="quality-icon">🔒</span>
+        <h3>セキュリティ</h3>
+        <p>全スタッフとNDA締結済み。機密情報も安心してお取り扱いいただけます。</p>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <div class="footer-logo"><div class="footer-slash"></div><div class="footer-circle"></div></div>
+      <div class="footer-text">PASS</div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 14: COST SIM 1 ==================== -->
+  <div class="slide slide-cost" id="slide-14">
+    <div class="slide-header">
+      <div class="section-icon"><div class="s-slash"></div><div class="s-circle"></div></div>
+      <div class="slide-header-content">
+        <div class="slide-header-label">Cost Simulation 01</div>
+        <div class="slide-header-title">コストシミュレーション①（対 採用）</div>
+      </div>
+    </div>
+    <div class="cost-layout">
+      <div style="display:flex; flex-direction:column; gap:40px;">
+        <div class="cost-block old-cost">
+          <h3>■A社（正社員採用）</h3>
+          <ul class="cost-items">
+            <li>年収 [500]万</li>
+            <li>採用費 [150]万</li>
+            <li>設備・福利厚生 等</li>
+          </ul>
+          <div class="cost-total">¥750<span style="font-size:28px;">万円</span></div>
+          <div class="cost-total-label">年間コスト（概算）</div>
+        </div>
+        <div class="cost-block new-cost">
+          <h3>■PASS（スタンダード）</h3>
+          <ul class="cost-items">
+            <li>月額 [20]万円 × 12ヶ月</li>
+            <li>採用リスクなし</li>
+            <li>解約リスクなし</li>
+          </ul>
+          <div class="cost-total">¥240<span style="font-size:28px;">万円</span></div>
+          <div class="cost-total-label">年間コスト</div>
+        </div>
+      </div>
+      <div class="cost-arrow">
+        <div class="arrow-icon">→</div>
+        <div class="savings-badge">
+          <div class="pct">[1/3]</div>
+          <div class="pct-label">以下に削減</div>
+        </div>
+        <p class="result-text" style="margin-top:20px;">コスト削減 + 解約リスクなし</p>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <div class="footer-logo"><div class="footer-slash"></div><div class="footer-circle"></div></div>
+      <div class="footer-text">PASS</div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 15: COST SIM 2 ==================== -->
+  <div class="slide slide-cost" id="slide-15">
+    <div class="slide-header">
+      <div class="section-icon"><div class="s-slash"></div><div class="s-circle"></div></div>
+      <div class="slide-header-content">
+        <div class="slide-header-label">Cost Simulation 02</div>
+        <div class="slide-header-title">コストシミュレーション②（対 外注）</div>
+        <div class="slide-header-sub">「見えないコスト」であるディレクション工数を [90]% 削減。</div>
+      </div>
+    </div>
+    <div class="cost-layout">
+      <div style="display:flex; flex-direction:column; gap:40px;">
+        <div class="cost-block old-cost">
+          <h3>■外注（従来）</h3>
+          <ul class="cost-items">
+            <li>業者選定・見積もり・契約</li>
+            <li>MTG・ディレクション</li>
+            <li>= 月間 [20]時間 の管理工数</li>
+          </ul>
+          <div class="cost-total" style="font-size:40px;">月[20]時間</div>
+          <div class="cost-total-label">管理工数（人件費換算 [XX]万円）</div>
+        </div>
+        <div class="cost-block new-cost">
+          <h3>■PASS</h3>
+          <ul class="cost-items">
+            <li>チャットで依頼するだけ</li>
+            <li>= 月間 [2]時間</li>
+            <li>空いた時間をコア業務へ</li>
+          </ul>
+          <div class="cost-total" style="font-size:40px;">月[2]時間</div>
+          <div class="cost-total-label">管理工数</div>
+        </div>
+      </div>
+      <div class="cost-arrow">
+        <div class="arrow-icon">→</div>
+        <div class="savings-badge">
+          <div class="pct">90%</div>
+          <div class="pct-label">工数削減</div>
+        </div>
+        <p class="result-text" style="margin-top:20px;">空いた時間をコア業務へ集中</p>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <div class="footer-logo"><div class="footer-slash"></div><div class="footer-circle"></div></div>
+      <div class="footer-text">PASS</div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 16: PRICING ==================== -->
+  <div class="slide slide-16" id="slide-16">
+    <div class="slide-header">
+      <div class="section-icon"><div class="s-slash"></div><div class="s-circle"></div></div>
+      <div class="slide-header-content">
+        <div class="slide-header-label">Plan & Pricing</div>
+        <div class="slide-header-title">料金プラン</div>
+      </div>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card light">
+        <div class="plan-badge">Light</div>
+        <div class="plan-name" style="color:var(--dark);">ライト</div>
+        <div class="plan-price" style="color:var(--dark);">¥[X]<span class="plan-price-unit">万円/月</span></div>
+        <div class="plan-price-note" style="color:var(--gray);">バナー制作メイン</div>
+        <ul class="plan-features">
+          <li><span class="feat-check" style="color:var(--teal);">✓</span><span style="color:var(--dark);">月[X]チケット付与</span></li>
+          <li><span class="feat-check" style="color:var(--teal);">✓</span><span style="color:var(--dark);">Web/Graphicデザイン対応</span></li>
+          <li><span class="feat-check" style="color:var(--teal);">✓</span><span style="color:var(--dark);">修正無制限</span></li>
+          <li><span class="feat-check" style="color:var(--teal);">✓</span><span style="color:var(--dark);">チャットサポート</span></li>
+        </ul>
+      </div>
+      <div class="pricing-card standard">
+        <div class="recommend-badge">★推奨</div>
+        <div class="plan-badge">Standard</div>
+        <div class="plan-name">スタンダード</div>
+        <div class="plan-price">¥[Y]<span class="plan-price-unit">万円/月</span></div>
+        <div class="plan-price-note" style="opacity:0.8;">LP・資料作成など</div>
+        <ul class="plan-features">
+          <li><span class="feat-check">✓</span>月[Y]チケット付与</li>
+          <li><span class="feat-check">✓</span>全ジャンルのデザイン対応</li>
+          <li><span class="feat-check">✓</span>修正無制限</li>
+          <li><span class="feat-check">✓</span>専任ディレクター制</li>
+          <li><span class="feat-check">✓</span>Webコーディング対応</li>
+        </ul>
+      </div>
+      <div class="pricing-card premium">
+        <div class="plan-badge">Premium</div>
+        <div class="plan-name">プレミアム</div>
+        <div class="plan-price">¥[Z]<span class="plan-price-unit">万円/月</span></div>
+        <div class="plan-price-note" style="color:rgba(255,255,255,0.6);">動画対応・最優先対応</div>
+        <ul class="plan-features">
+          <li><span class="feat-check">✓</span>月[Z]チケット付与</li>
+          <li><span class="feat-check">✓</span>動画編集対応</li>
+          <li><span class="feat-check">✓</span>最優先対応</li>
+          <li><span class="feat-check">✓</span>月次戦略MTG</li>
+          <li><span class="feat-check">✓</span>ブランドガイドライン策定</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <div class="footer-logo"><div class="footer-slash"></div><div class="footer-circle"></div></div>
+      <div class="footer-text">PASS</div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 17: CONTRACT ==================== -->
+  <div class="slide slide-17" id="slide-17">
+    <div class="slide-header">
+      <div class="section-icon"><div class="s-slash"></div><div class="s-circle"></div></div>
+      <div class="slide-header-content">
+        <div class="slide-header-label">Getting Started</div>
+        <div class="slide-header-title">契約の流れ・トライアル</div>
+        <div class="slide-header-sub">まずは [1ヶ月] から。リスクなく始められます。</div>
+      </div>
+    </div>
+    <div class="contract-layout">
+      <div class="contract-steps">
+        <div class="contract-step"><div class="cs-num">1</div><div class="cs-text"><h4>お問い合わせ</h4><p>フォームまたはメールよりご連絡ください</p></div></div>
+        <div class="contract-step"><div class="cs-num">2</div><div class="cs-text"><h4>無料相談（30分）</h4><p>貴社の課題・ニーズをヒアリングします</p></div></div>
+        <div class="contract-step"><div class="cs-num">3</div><div class="cs-text"><h4>ご契約（電子契約）</h4><p>クラウドサインによる電子契約で即手続き可</p></div></div>
+        <div class="contract-step"><div class="cs-num">4</div><div class="cs-text"><h4>利用開始</h4><p>契約翌日からチャットで依頼開始できます</p></div></div>
+      </div>
+      <div class="campaign-box">
+        <div class="star">★</div>
+        <h3>今なら<br>[初回1ヶ月半額]<br>キャンペーン実施中</h3>
+        <p>まずはお気軽にご相談ください。<br>御社の課題に合わせた最適なプランをご提案します。</p>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <div class="footer-logo"><div class="footer-slash"></div><div class="footer-circle"></div></div>
+      <div class="footer-text">PASS</div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 18: FAQ ==================== -->
+  <div class="slide slide-18" id="slide-18">
+    <div class="slide-header">
+      <div class="section-icon"><div class="s-slash"></div><div class="s-circle"></div></div>
+      <div class="slide-header-content">
+        <div class="slide-header-label">Support</div>
+        <div class="slide-header-title">サポート・FAQ</div>
+      </div>
+    </div>
+    <div class="faq-grid">
+      <div class="faq-item">
+        <div class="faq-q"><div class="faq-q-mark">Q</div>修正回数に制限はありますか？</div>
+        <div class="faq-a">A. 原則無制限です。軽微な変更は1営業日〜で対応します。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><div class="faq-q-mark">Q</div>途中解約はできますか？</div>
+        <div class="faq-a">A. 更新月の[1]ヶ月前告知で解約可能です。違約金はありません。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><div class="faq-q-mark">Q</div>チャットツールは何に対応していますか？</div>
+        <div class="faq-a">A. Chatwork, Slack, Teams等に対応しています。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><div class="faq-q-mark">Q</div>複数案件を同時に依頼できますか？</div>
+        <div class="faq-a">A. 原則1案件ずつとなります。同時進行をご希望の場合は2口契約などをご検討ください。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><div class="faq-q-mark">Q</div>使い切れなかったチケットはどうなりますか？</div>
+        <div class="faq-a">A. 翌月への繰り越しは[1ヶ月分]まで可能です。詳細はご契約時にご確認ください。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><div class="faq-q-mark">Q</div>支払い方法は？</div>
+        <div class="faq-a">A. 月額払い・一括払いを選択可能です。一括払いは5%割引で請求書を発行します。</div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <div class="footer-logo"><div class="footer-slash"></div><div class="footer-circle"></div></div>
+      <div class="footer-text">PASS</div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 19: WHY NOW ==================== -->
+  <div class="slide slide-19" id="slide-19">
+    <h2>Why Now? なぜ今か</h2>
+    <p class="why-body">
+      迷っている間にも、競合は動いています。<br><br>
+      クリエイティブの改善は、後回しにするほど機会損失が大きくなります。<br>
+      今すぐ体制を整え、事業成長のスピードを加速させましょう。
+    </p>
+    <div class="why-cta">今すぐ無料相談を予約する →</div>
+    <div class="slide-footer" style="left: 200px;">
+      <div class="footer-logo"><div class="footer-slash" style="background:rgba(255,255,255,0.7);"></div><div class="footer-circle" style="background:rgba(255,255,255,0.7);"></div></div>
+      <div class="footer-text" style="color:rgba(255,255,255,0.7);">PASS</div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 20: CONTACT ==================== -->
+  <div class="slide slide-20" id="slide-20">
+    <div class="slide-header">
+      <div class="section-icon"><div class="s-slash"></div><div class="s-circle"></div></div>
+      <div class="slide-header-content">
+        <div class="slide-header-label">Contact</div>
+        <div class="slide-header-title">お問い合わせ</div>
+        <div class="slide-header-sub">まずは無料相談（30分）で、貴社の課題をお聞かせください。</div>
+      </div>
+    </div>
+    <div class="cta-layout">
+      <div class="cta-left">
+        <h2>デザインの力で、<br>あなたのビジネスを<br>加速させましょう。</h2>
+        <p>まずは30分の無料相談からお気軽にどうぞ。貴社の課題に合わせた最適なプランをご提案します。</p>
+      </div>
+      <div class="cta-right">
+        <h3>お問い合わせ先</h3>
+        <ul class="cta-info">
+          <li><div class="cta-icon">📋</div><span>[フォームURL]</span></li>
+          <li><div class="cta-icon">✉️</div><span>info@sakazuki.co.jp</span></li>
+          <li><div class="cta-icon">🏢</div><span>株式会社SAKAZUKI</span></li>
+        </ul>
+        <div class="cta-company">
+          <p>株式会社SAKAZUKI</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <div class="footer-logo"><div class="footer-slash"></div><div class="footer-circle"></div></div>
+      <div class="footer-text">PASS</div>
+    </div>
+  </div>
+
+</div><!-- end slide-container -->
+
+<!-- Controls -->
+<div class="controls">
+  <button id="prevBtn" onclick="changeSlide(-1)" disabled>← 前へ</button>
+  <div class="slide-dots" id="dotContainer"></div>
+  <div class="slide-counter" id="counter">1 / 20</div>
+  <button id="nextBtn" onclick="changeSlide(1)">次へ →</button>
+</div>
+
+<script>
+  let currentSlide = 1;
+  const totalSlides = 20;
+
+  // Create dots
+  const dotContainer = document.getElementById('dotContainer');
+  for (let i = 1; i <= totalSlides; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === 1 ? ' active' : '');
+    dot.onclick = () => goToSlide(i);
+    dotContainer.appendChild(dot);
+  }
+
+  function goToSlide(n) {
+    document.getElementById('slide-' + currentSlide).classList.remove('active');
+    document.querySelectorAll('.dot')[currentSlide - 1].classList.remove('active');
+    currentSlide = n;
+    document.getElementById('slide-' + currentSlide).classList.add('active');
+    document.querySelectorAll('.dot')[currentSlide - 1].classList.add('active');
+    document.getElementById('counter').textContent = currentSlide + ' / ' + totalSlides;
+    document.getElementById('prevBtn').disabled = currentSlide === 1;
+    document.getElementById('nextBtn').disabled = currentSlide === totalSlides;
+  }
+
+  function changeSlide(dir) {
+    const next = currentSlide + dir;
+    if (next >= 1 && next <= totalSlides) goToSlide(next);
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault(); changeSlide(1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault(); changeSlide(-1);
+    }
+  });
+
+  // Auto scale to fit viewport
+  function scaleSlide() {
+    const container = document.getElementById('slideContainer');
+    const vw = window.innerWidth - 40;
+    const scale = Math.min(1, vw / 1920);
+    container.style.transform = 'scale(' + scale + ')';
+    container.style.transformOrigin = 'top center';
+    container.style.marginBottom = (1080 * scale - 1080 + 100) + 'px';
+  }
+
+  scaleSlide();
+  window.addEventListener('resize', scaleSlide);
+</script>
+</body>
+</html>
